@@ -15,14 +15,54 @@
 <script type="text/javascript">
 
 var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update });
-
+var cursors;
+var character;
 function preload() {
+	//game.stage.backgroundColor = '#fff';
+	game.load.spritesheet('character', 'assets/sprites/character.png', 80, 80);
 }
 
 function create() {
+	character = game.add.sprite(game.width/2,game.height-45,'character');
+	character.animations.add('right', [13, 14], 12, true);
+	character.animations.add('left', [16, 15], 12, true);
+	character.animations.add('jump',[2, 3], true);
+	character.animations.add('idle', [0], true);
+	character.animations.add('fall', [5], true);
+	character.animations.add('onAir', [4], true);
+	game.physics.startSystem(Phaser.Physics.ARCADE);
+	game.physics.arcade.enable(character);
+
+    //  Player physics properties. Give the little guy a slight bounce.
+    character.body.bounce.y = 0.2;
+    character.body.gravity.y = 500;
+    character.body.collideWorldBounds = true;
+
+	//walk.enableUpdate = true;
+	//character.animations.play('walk',5, true);
 }
 
 function update() {
+	character.body.velocity.x = 0;
+	cursors = game.input.keyboard.createCursorKeys();
+	if (cursors.up.isDown){
+		character.animations.play('jump');
+		character.frame = 4;
+		character.body.velocity.y = -350;
+	}
+	if(cursors.right.isDown){
+		character.animations.play('right');
+		character.body.velocity.x = 100;
+	}
+	if(cursors.left.isDown){
+		character.animations.play('left');
+		character.body.velocity.x = -100;
+	}
+	if(cursors.left.isUp && cursors.right.isUp && cursors.up.isUp)
+	{
+		//character.animations.play('idle');
+		character.animations.play('fall');
+	}
 }
 
 </script>
