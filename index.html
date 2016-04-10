@@ -57,11 +57,11 @@ var armoryLevel = 0;
 var bankLevel = 0;
 var killed = 0;
 var toKill = 10;
-var killedText;
+var killedText = "";
 var livesCount = 3;
 var levelText = "";
 var lastLeft;
-var coinPower = 1;
+var coinPower = 5;
 var ais = [];
 
 $("#nextLevelBtn").click(function(){startNewLevel()});
@@ -165,34 +165,12 @@ function create() {
 	character.animations.add('lShoot', [21, 22, 23, 24], 20, true);
 	character.animations.add('rShoot', [6, 7, 8, 9], 20, true);
 
+
+	renderAis();
+
+
 	//ais = game.add.group();
 	//game.physics.arcade.enable(ai);
-	for(var i = 0; i < toKill; i++){
-		ai = game.add.sprite(game.width-80, game.height-300, 'ai');
-		game.physics.arcade.enable(ai);
-		ai.physicsBodyType = Phaser.Physics.ARCADE;
-		ai.body.bounce.y = 0;
-		ai.body.gravity.y = 500;
-		ai.body.collideWorldBounds = true;
-		ai.height = 160;
-		ai.width = 160;
-		ai.health = 5;
-		ai.lastLeft = false;
-		ais[i] = ai;
-		i++;
-		ai = game.add.sprite(80, game.height-300, 'ai');
-		game.physics.arcade.enable(ai);
-		ai.physicsBodyType = Phaser.Physics.ARCADE;
-		ai.body.bounce.y = 0;
-		ai.body.gravity.y = 500;
-		ai.body.collideWorldBounds = true;
-		ai.height = 160;
-		ai.width = 160;
-		ai.health = 5;
-		ai.lastLeft = false;
-		ais[i] = ai;
-
-	}
 
 	game.physics.arcade.enable(character);
 	character.physicsBodyType = Phaser.Physics.ARCADE;
@@ -259,7 +237,37 @@ function update() {
 
 function levelUp(){
 	toKill += 10;
+	killed = 0;
 	updateText();
+	renderAis();
+}
+
+function renderAis(){
+	for(var i = killed; i < toKill; i++){
+		ai = game.add.sprite(game.width-80, game.height-300, 'ai');
+		game.physics.arcade.enable(ai);
+		ai.physicsBodyType = Phaser.Physics.ARCADE;
+		ai.body.bounce.y = 0;
+		ai.body.gravity.y = 500;
+		ai.body.collideWorldBounds = true;
+		ai.height = 160;
+		ai.width = 160;
+		ai.health = 5;
+		ai.lastLeft = false;
+		ais[i] = ai;
+		i++;
+		ai = game.add.sprite(80, game.height-300, 'ai');
+		game.physics.arcade.enable(ai);
+		ai.physicsBodyType = Phaser.Physics.ARCADE;
+		ai.body.bounce.y = 0;
+		ai.body.gravity.y = 500;
+		ai.body.collideWorldBounds = true;
+		ai.height = 160;
+		ai.width = 160;
+		ai.health = 5;
+		ai.lastLeft = false;
+		ais[i] = ai;
+	}
 }
 
 function updateAis(ais){
@@ -303,15 +311,15 @@ function renderHearts(){
 function getShot(ai, coin){
 	//ai.kill();
 	coin.kill();
-	console.log(ai.health);
+	//console.log(ai.health);
 	ai.health -= coinPower;
 	if(ai.health <= 0){
 		ai.kill();
 		killed+=1;
 		updateText();
-		if(killed >= toKill)
-			showNextLevelMenu();
 	}
+	if(killed >= toKill)
+		showNextLevelMenu();
 }
 function shoot(){
 	if(lastLeft){
