@@ -79,11 +79,11 @@ function showNextLevelMenu(){
 	$("#hospitalCost").text((hospitalLevel + 1) * 10000 + "$");
 	$("#armoryCost").text((armoryLevel + 1) * 10000 + "$");
 	$("#bankCost").text((bankLevel + 1) * 10000 + "$");
-	if((hospitalLevel + 1) * 10000) $("#buyHospital").addClass("pure-button-disabled");
+	if((hospitalLevel + 1) * 10000 <= money) $("#buyHospital").addClass("pure-button-disabled");
 	else $("#buyHospital").removeClass("pure-button-disabled");
-	if((armoryLevel + 1) * 10000) $("#buyArmory").addClass("pure-button-disabled");
+	if((armoryLevel + 1) * 10000 <= money) $("#buyArmory").addClass("pure-button-disabled");
 	else $("#buyArmory").removeClass("pure-button-disabled");
-	if((bankLevel + 1) * 10000) $("#buyBank").addClass("pure-button-disabled");
+	if((bankLevel + 1) * 10000 <= money) $("#buyBank").addClass("pure-button-disabled");
 	else $("#buyBank").removeClass("pure-button-disabled");
 }
 
@@ -120,6 +120,21 @@ function preload() {
 	game.load.image('ground', 'assets/images/street_bottom.png');
 	game.load.image('live', 'assets/images/live.png');
 	game.load.image('coin', 'assets/images/money.png');
+	game.load.image('hospital1', 'assets/images/hospital_tier1.png');
+	game.load.image('hospital2', 'assets/images/hospital_tier2.png');
+	game.load.image('hospital3', 'assets/images/hospital_tier3.png');
+	game.load.image('hospital4', 'assets/images/hospital_tier4.png');
+	game.load.image('hospital5', 'assets/images/hospital_tier5.png');
+	game.load.image('armory1', 'assets/images/armory_tier1.png');
+	game.load.image('armory2', 'assets/images/armory_tier2.png');
+	game.load.image('armory3', 'assets/images/armory_tier3.png');
+	game.load.image('armory4', 'assets/images/armory_tier4.png');
+	game.load.image('armory5', 'assets/images/armory_tier5.png');
+	game.load.image('bank1', 'assets/images/bank_tier1.png');
+	game.load.image('bank2', 'assets/images/bank_tier2.png');
+	game.load.image('bank3', 'assets/images/bank_tier3.png');
+	game.load.image('bank4', 'assets/images/bank_tier4.png');
+	game.load.image('bank5', 'assets/images/bank_tie.r5png');
 	game.load.spritesheet('ai', 'assets/sprites/ai.png', 80, 80);
 	game.load.spritesheet('character', 'assets/sprites/player.png', 80, 80);
 }
