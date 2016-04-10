@@ -79,11 +79,11 @@ function showNextLevelMenu(){
 	$("#hospitalCost").text((hospitalLevel + 1) * 10000 + "$");
 	$("#armoryCost").text((armoryLevel + 1) * 10000 + "$");
 	$("#bankCost").text((bankLevel + 1) * 10000 + "$");
-	if((hospitalLevel + 1) * 10000 <= money) $("#buyHospital").addClass("pure-button-disabled");
+	if((hospitalLevel + 1) * 10000 > money) $("#buyHospital").addClass("pure-button-disabled");
 	else $("#buyHospital").removeClass("pure-button-disabled");
-	if((armoryLevel + 1) * 10000 <= money) $("#buyArmory").addClass("pure-button-disabled");
+	if((armoryLevel + 1) * 10000 > money) $("#buyArmory").addClass("pure-button-disabled");
 	else $("#buyArmory").removeClass("pure-button-disabled");
-	if((bankLevel + 1) * 10000 <= money) $("#buyBank").addClass("pure-button-disabled");
+	if((bankLevel + 1) * 10000 > money) $("#buyBank").addClass("pure-button-disabled");
 	else $("#buyBank").removeClass("pure-button-disabled");
 }
 
