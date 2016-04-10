@@ -3,15 +3,40 @@
 <head> 
 	<meta charset="UTF-8" />
 	<title>Millionaire</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<script type="text/javascript" src="js/phaser/build/phaser.js"></script>
-    <style type="text/css">
-        body {
-            margin: 0;
-        }
-    </style>
+	<link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.6.0/pure-min.css">
+	<link rel="stylesheet" type="text/css" href="css/style.css">
 </head>
 <body>
+<div class="nextLevelMenu hidden ">
+	<div class="pure-g">
+		<div class="pure-u-1-3">
+			<div class="element">
+				<img src="assets/images/hospital_tier5.png">
+				<span id="hospitalCost">99999$</span>
+				<button class="pure-button" id="buyHospital">Buy</button>
+			</div>
+		</div>
+		<div class="pure-u-1-3">
+			<div class="element">
+				<img src="assets/images/armory_tier5.png">
+				<span id="armoryCost">99999$</span>
+				<button class="pure-button" id="buyArmory">Buy</button>
+			</div>	
+		</div>
+		<div class="pure-u-1-3">
+			<div class="element">
+				<img src="assets/images/bank_tier5.png">
+				<span id="bankCost">99999$</span>
+				<button class="pure-button" id="buyBank">Buy</button>
+			</div>
+	</div>
+	<button class="button-xlarge pure-button" id="nextLevelBtn">Next level</button>
+</div>
 
+
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.12.3.min.js"></script>
 <script type="text/javascript">
 
 var game = new Phaser.Game(window.innerWidth, window.innerHeight , Phaser.AUTO, '', { preload: preload, create: create, update: update });
@@ -34,6 +59,19 @@ var levelText;
 var lastLeft;
 var coinPower = 1;
 var ais = [];
+
+function startNewLevel(){
+	levelUp();
+	$(".nextLevelMenu").addClass("hidden");
+}
+
+function showNextLevelMenu(){
+	game.pause();
+	//$("#hospitalCost").text( + "$");
+	//$("#armoryCost").text( + "$");
+	//$("#bankCost").text( + "$");
+	$(".nextLevelMenu").removeClass("hidden");
+}
 
 function preload() {
 	game.stage.backgroundColor = '#fff';
@@ -187,12 +225,12 @@ function updateAis(ais){
 	ais.forEach(function(ai){
 		if(ai.x > character.x && !ai.body.touching.left){
 			//ai.animations.play('left');
-			ai.body.velocity.x = -100;
+			ai.body.velocity.x = -50;
 			lastLeft = true;
 		}
 		else if(ai.x < character.x && !ai.body.touching.right){
 			//ai.animations.play('right');
-			ai.body.velocity.x = 100;
+			ai.body.velocity.x = 50;
 			lastLeft = false;
 		}else{
 			//ai.animations.play('attack');
