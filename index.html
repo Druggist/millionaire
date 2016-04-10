@@ -325,11 +325,6 @@ function renderBuildings(){
 	renderHospital();
 	renderArmory();
 	renderBank();
-	ground.kill();
-	ground = platforms.create(0, game.world.height - 50, 'ground');
-	ground.scale.setTo(2, 2);
-	ground.body.immovable = true;
-	ground.physicsBodyType = Phaser.Physics.ARCADE;
 }
 
 function renderHospital(){
@@ -406,6 +401,7 @@ function renderBank(){
 		bank = game.add.sprite(game.width / 2 + 300   ,game.height /2,'bank1');
 		bank.height = game.height / 2;
 		bank.width = game.height / 2;
+		bank.z = -2;
 		break;
 		case 2:
 		bank = game.add.sprite(game.width / 2 + 300 ,game.height /2,'bank2');
