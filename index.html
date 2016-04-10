@@ -20,24 +20,28 @@ var character;
 var platforms;
 var ground;
 var hearts;
+var coins;
 
 var killed = 0;
 var toKill = 10;
 var killedText;
 var livesCount = 3;
 var levelText;
+var lastLeft;
 
 function preload() {
 	game.stage.backgroundColor = '#fff';
 	game.load.image('background', 'assets/images/bg.png');
 	game.load.image('ground', 'assets/images/street_bottom.png');
 	game.load.image('live', 'assets/images/live.png');
+	game.load.image('coin', 'assets/images/money.png');
 	game.load.spritesheet('character', 'assets/sprites/player.png', 80, 80);
 }
 
 function create() {
 
 	levelUpKey = game.input.keyboard.addKey(Phaser.Keyboard.Z);
+	shootKey = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
 
 	game.physics.startSystem(Phaser.Physics.ARCADE);
 
@@ -46,13 +50,16 @@ function create() {
 	bg.width = game.width;
 	bg.smoothed = false;
 
+	coins = game.add.group();
+	coins.enableBody = true;
+
+
 	lives = game.add.group();
 
 	for(var i = 1; i <= livesCount; i++){
-		var live = lives.create(game.width-(30*i), 10, 'live');
-		live.width = 30;
-		live.height = 30;
-		console.log("x: "+live.x+" y: "+live.y);
+		var live = lives.create(game.width-(50*i)-10, 10, 'live');
+		live.width = 50;
+		live.height = 50;
 	}
 
 	platforms = game.add.group();
@@ -62,19 +69,29 @@ function create() {
 	ground.body.immovable = true;
 	ground.physicsBodyType = Phaser.Physics.ARCADE;
 
-	character = game.add.sprite(game.width/2,game.height-150,'character');
+	character = game.add.sprite(game.width/2,game.height-300,'character');
 	character.animations.add('right', [13, 14], 12, true);
 	character.animations.add('left', [29, 28], 12, true);
-	character.animations.add('jump',[2, 3], true);
-	character.animations.add('idle', [0], true);
-	character.animations.add('fall', [5], true);
-	character.animations.add('onAir', [4], true);
+	character.animations.add('rJump',[2, 3], true);
+	character.animations.add('lJump',[17, 18], true);
+	character.animations.add('lIdle', [15], true);
+	character.animations.add('rIdle', [0], true);
+	character.animations.add('rFall', [5], true);
+	character.animations.add('lFall', [20], true);
+	character.animations.add('rOnAir', [4], true);
+	character.animations.add('lOnAir', [19], true);
+	character.animations.add('lShoot', [21, 22, 23, 24], 12, true);
+	character.animations.add('rShoot', [6, 7, 8, 9], 12, true);
+
 	game.physics.arcade.enable(character);
 	character.physicsBodyType = Phaser.Physics.ARCADE;
 
-    character.body.bounce.y = 0.2;
+    character.body.bounce.y = 0;
     character.body.gravity.y = 500;
     character.body.collideWorldBounds = true;
+    character.height = 160;
+    character.width = 160;
+
 
     levelText = game.add.text(16, 10, 'Level ' + toKill/10, { fontSize: '32px', fill: '#000' });
     killedText = game.add.text(16, 40, 'To kill: '+ killed + "/" + toKill, { fontSize: '32px', fill: '#000' });
@@ -88,40 +105,54 @@ function update() {
 
 	character.body.velocity.x = 0;
 	cursors = game.input.keyboard.createCursorKeys();
-	if (cursors.up.isDown && character.body.touching.down){
-		character.animations.play('jump');
-		character.frame = 4;
-		character.body.velocity.y = -350;
+	function shoot(){
+		if(lastLeft)
+			character.animations.play('lShoot');
+		else
+			character.animations.play('rShoot');
+
+		var coin = coins.create(character.x + 20, character.y + character.width/2, 'coin');
+		coin.width = 20;
+		coin.height = 20;
+
+		if(lastLeft)
+			coin.body.gravity.x = -300;
+		else
+			coin.body.gravity.x = 300;
 	}
+	shootKey.onDown.add(shoot, this);
+	/*if(shootKey.isDown){
+		
+	}*/
 	if(cursors.up.isDown && character.body.touching.down){
-		character.animations.play('jump');
+		if(lastLeft)
+			character.animations.play('lJump');
+		else
+			character.animations.play('rJump');
 		character.body.velocity.y = -350;
 	}
 	if(cursors.right.isDown){
 		character.animations.play('right');
-		//character.frame = 13;
 		character.body.velocity.x = 100;
+		lastLeft = false;
 	}
 	if(cursors.left.isDown){
 		character.animations.play('left');
-		//character.frame = 15;
 		character.body.velocity.x = -100;
+		lastLeft = true;
 	}
-	if(cursors.left.isUp){
-		character.animations.play()
-	}
-	if(cursors.left.isUp && cursors.right.isUp && cursors.up.isUp)
+	if(!cursors.left.isDown && !cursors.right.isDown && !cursors.up.isDown && !shootKey.isDown)
 	{
-		//character.animations.play('idle');
-		character.animations.stop();
-		character.animations.play('fall');
+		if(lastLeft)
+			character.animations.play('lFall');
+		else
+			character.animations.play('rFall');
 	}
-	/*if(game.physics.arcade.collide(character, platforms)){
-		character.animations.play('idle');
-	}*/
-	if(cursors.left.isUp && cursors.right.isUp && cursors.up.isUp && character.body.touching.down){
-		character.animations.stop();
-		character.animations.play('idle');
+	if(!cursors.left.isDown && !cursors.right.isDown && !cursors.up.isDown && !shootKey.isDown && character.body.touching.down){
+		if(lastLeft)
+			character.animations.play('lIdle');
+		else
+			character.animations.play('rIdle');
 	}
 	if(levelUpKey.isDown){
 		levelUp();
@@ -136,7 +167,6 @@ function collisionHandler(character, ground){
 }
 
 function levelUp(){
-	console.log("ok");
 	toKill += 10;
 	updateText();
 }
