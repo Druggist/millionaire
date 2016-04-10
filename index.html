@@ -44,21 +44,19 @@ var cursors;
 var character;
 var platforms;
 var ground;
-var hearts;
 var coins;
 var ai;
 var coin;
-var ai2;
 var lives;
 
-var money = 0;
+var money = 100000;
 var hospitalLevel = 0;
 var armoryLevel = 0;
 var bankLevel = 0;
 var killed = 0;
 var toKill = 10;
 var killedText = "";
-var livesCount = 3;
+var livesCount = 5;
 var levelText = "";
 var lastLeft;
 var coinPower = 5;
@@ -157,7 +155,7 @@ function create() {
 
 	lives = game.add.group();
 
-	renderHearts(lives);
+	renderHearts();
 
 	platforms = game.add.group();
     platforms.enableBody = true;
@@ -192,7 +190,7 @@ function create() {
 
     character.body.bounce.y = 0;
     character.body.gravity.y = 300;
-    character.body.collideWorldBounds = true;
+    character.body.collideWorldBounds = false;
     character.height = 160;
     character.width = 160;
 
@@ -296,10 +294,10 @@ function updateAis(ais){
 			//ai.animations.play('right');
 			ai.body.velocity.x = 50;
 			lastLeft = false;
-		}else{
+		}else if(game.physics.arcade.collide(character, ais)){
 			//ai.animations.play('attack');
-			//ai.body.velocity.x = 0;
-			updateLives(hearts-1)
+			ai.body.velocity.x = 0;
+			updateLives(livesCount-1);
 		}
 	});
 }
@@ -309,18 +307,21 @@ function updateText(){
     killedText.text = 'To kill: '+ killed + "/" + toKill;
 }
 
-function updateLives(_livesCount){
-	livesCount = _livesCount;
-	renderHearts();
-
-}
-
 function renderHearts(){
+	lives.forEach(function(live){
+		live.kill();
+	});
 	for(var i = 1; i <= livesCount; i++){
 		var live = lives.create(game.width-(50*i)-10, 10, 'live');
 		live.width = 50;
 		live.height = 50;
 	}
+}
+
+function updateLives(_livesCount){
+	livesCount = _livesCount;
+	renderHearts();
+
 }
 
 function getShot(ai, coin){
