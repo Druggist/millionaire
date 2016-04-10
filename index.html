@@ -14,13 +14,17 @@
 
 <script type="text/javascript">
 
-var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update });
+var game = new Phaser.Game(window.innerWidth, window.innerHeight , Phaser.AUTO, '', { preload: preload, create: create, update: update });
 var cursors;
 var character;
 var platforms;
 var ground;
 var hearts;
 var coins;
+var ai;
+var coin;
+var ai2;
+var lives;
 
 var killed = 0;
 var toKill = 10;
@@ -28,6 +32,8 @@ var killedText;
 var livesCount = 3;
 var levelText;
 var lastLeft;
+var coinPower = 1;
+var ais = [];
 
 function preload() {
 	game.stage.backgroundColor = '#fff';
@@ -35,6 +41,7 @@ function preload() {
 	game.load.image('ground', 'assets/images/street_bottom.png');
 	game.load.image('live', 'assets/images/live.png');
 	game.load.image('coin', 'assets/images/money.png');
+	game.load.spritesheet('ai', 'assets/sprites/ai.png', 80, 80);
 	game.load.spritesheet('character', 'assets/sprites/player.png', 80, 80);
 }
 
@@ -56,11 +63,7 @@ function create() {
 
 	lives = game.add.group();
 
-	for(var i = 1; i <= livesCount; i++){
-		var live = lives.create(game.width-(50*i)-10, 10, 'live');
-		live.width = 50;
-		live.height = 50;
-	}
+	renderHearts(lives);
 
 	platforms = game.add.group();
     platforms.enableBody = true;
@@ -80,14 +83,43 @@ function create() {
 	character.animations.add('lFall', [20], true);
 	character.animations.add('rOnAir', [4], true);
 	character.animations.add('lOnAir', [19], true);
-	character.animations.add('lShoot', [21, 22, 23, 24], 12, true);
-	character.animations.add('rShoot', [6, 7, 8, 9], 12, true);
+	character.animations.add('lShoot', [21, 22, 23, 24], 20, true);
+	character.animations.add('rShoot', [6, 7, 8, 9], 20, true);
+
+	//ais = game.add.group();
+	//game.physics.arcade.enable(ai);
+	for(var i = 0; i < toKill; i++){
+		ai = game.add.sprite(game.width-80, game.height-300, 'ai');
+		game.physics.arcade.enable(ai);
+		ai.physicsBodyType = Phaser.Physics.ARCADE;
+		ai.body.bounce.y = 0;
+		ai.body.gravity.y = 500;
+		ai.body.collideWorldBounds = true;
+		ai.height = 160;
+		ai.width = 160;
+		ai.health = 5;
+		ai.lastLeft = false;
+		ais[i] = ai;
+		i++;
+		ai = game.add.sprite(80, game.height-300, 'ai');
+		game.physics.arcade.enable(ai);
+		ai.physicsBodyType = Phaser.Physics.ARCADE;
+		ai.body.bounce.y = 0;
+		ai.body.gravity.y = 500;
+		ai.body.collideWorldBounds = true;
+		ai.height = 160;
+		ai.width = 160;
+		ai.health = 5;
+		ai.lastLeft = false;
+		ais[i] = ai;
+
+	}
 
 	game.physics.arcade.enable(character);
 	character.physicsBodyType = Phaser.Physics.ARCADE;
 
     character.body.bounce.y = 0;
-    character.body.gravity.y = 500;
+    character.body.gravity.y = 300;
     character.body.collideWorldBounds = true;
     character.height = 160;
     character.width = 160;
@@ -95,35 +127,21 @@ function create() {
 
     levelText = game.add.text(16, 10, 'Level ' + toKill/10, { fontSize: '32px', fill: '#000' });
     killedText = game.add.text(16, 40, 'To kill: '+ killed + "/" + toKill, { fontSize: '32px', fill: '#000' });
-    //livesText = game.add.test(game.width-16, 10, '')
 }
 
 function update() {
 
-	game.physics.arcade.overlap(character, ground, collisionHandler, null, this);
 	game.physics.arcade.collide(character, platforms);
+	game.physics.arcade.collide(ais, platforms);
+	game.physics.arcade.collide(ais, character);
+	game.physics.arcade.overlap(ais, coins, getShot, null, this);
 
 	character.body.velocity.x = 0;
+
 	cursors = game.input.keyboard.createCursorKeys();
-	function shoot(){
-		if(lastLeft)
-			character.animations.play('lShoot');
-		else
-			character.animations.play('rShoot');
-
-		var coin = coins.create(character.x + 20, character.y + character.width/2, 'coin');
-		coin.width = 20;
-		coin.height = 20;
-
-		if(lastLeft)
-			coin.body.gravity.x = -300;
-		else
-			coin.body.gravity.x = 300;
-	}
 	shootKey.onDown.add(shoot, this);
-	/*if(shootKey.isDown){
-		
-	}*/
+
+	updateAis(ais);
 	if(cursors.up.isDown && character.body.touching.down){
 		if(lastLeft)
 			character.animations.play('lJump');
@@ -159,16 +177,29 @@ function update() {
 	}
 	//game.physics.arcade.overlap(character, ground, isTouchingGround, null, this)
 }
-//function isTouchingGround(character, ground){
-//	character.animations.play('iddle');
-//}
-function collisionHandler(character, ground){
-	//character.animations.play('idle');
-}
 
 function levelUp(){
 	toKill += 10;
 	updateText();
+}
+
+function updateAis(ais){
+	ais.forEach(function(ai){
+		if(ai.x > character.x && !ai.body.touching.left){
+			//ai.animations.play('left');
+			ai.body.velocity.x = -100;
+			lastLeft = true;
+		}
+		else if(ai.x < character.x && !ai.body.touching.right){
+			//ai.animations.play('right');
+			ai.body.velocity.x = 100;
+			lastLeft = false;
+		}else{
+			//ai.animations.play('attack');
+			//ai.body.velocity.x = 0;
+			updateLives(hearts-1)
+		}
+	});
 }
 
 function updateText(){
@@ -176,8 +207,48 @@ function updateText(){
     killedText.text = 'To kill: '+ killed + "/" + toKill;
 }
 
-function updateLives(_lives){
-	lives = _lives;
+function updateLives(_livesCount){
+	livesCount = _livesCount;
+	renderHearts();
+
+}
+
+function renderHearts(){
+	for(var i = 1; i <= livesCount; i++){
+		var live = lives.create(game.width-(50*i)-10, 10, 'live');
+		live.width = 50;
+		live.height = 50;
+	}
+}
+
+function getShot(ai, coin){
+	//ai.kill();
+	coin.kill();
+	console.log(ai.health);
+	ai.health -= coinPower;
+	if(ai.health <= 0){
+		ai.kill();
+		killed+=1;
+		updateText();
+	}
+}
+function shoot(){
+	if(lastLeft){
+		character.animations.play('lShoot');
+		coin = coins.create(character.x - 20, character.y + character.width/2, 'coin');
+	}else{
+		character.animations.play('rShoot');
+		coin = coins.create(character.x + 170, character.y + character.width/2, 'coin');
+	}
+
+	//coin = coins.create(character.x + 20, character.y + character.width/2, 'coin');
+	coin.width = 20;
+	coin.height = 20;
+
+	if(lastLeft)
+		coin.body.gravity.x = -300;
+	else
+		coin.body.gravity.x = 300;
 }
 
 </script>
