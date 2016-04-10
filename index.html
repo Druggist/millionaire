@@ -48,8 +48,11 @@ var coins;
 var ai;
 var coin;
 var lives;
+var hospital;
+var armory;
+var bank;
 
-var money = 100000;
+var money = 99999999;
 var hospitalLevel = 0;
 var armoryLevel = 0;
 var bankLevel = 0;
@@ -59,7 +62,7 @@ var killedText = "";
 var livesCount = 5;
 var levelText = "";
 var lastLeft;
-var coinPower = 5;
+var coinPower = 10;
 var ais = [];
 
 $("#nextLevelBtn").click(function(){startNewLevel()});
@@ -68,6 +71,7 @@ $("#buyArmory").click(function(){buyArmoryUpgrade()});
 $("#buyBank").click(function(){buyBankUpgrade()});
 
 function startNewLevel(){
+	renderBuildings();
 	levelUp();
 	$(".nextLevelMenu").addClass("hidden");
 }
@@ -132,7 +136,7 @@ function preload() {
 	game.load.image('bank2', 'assets/images/bank_tier2.png');
 	game.load.image('bank3', 'assets/images/bank_tier3.png');
 	game.load.image('bank4', 'assets/images/bank_tier4.png');
-	game.load.image('bank5', 'assets/images/bank_tie.r5png');
+	game.load.image('bank5', 'assets/images/bank_tier5.png');
 	game.load.spritesheet('ai', 'assets/sprites/ai.png', 80, 80);
 	game.load.spritesheet('character', 'assets/sprites/player.png', 80, 80);
 }
@@ -156,6 +160,7 @@ function create() {
 	lives = game.add.group();
 
 	renderHearts();
+	renderBuildings();
 
 	platforms = game.add.group();
     platforms.enableBody = true;
@@ -310,6 +315,121 @@ function updateText(){
     killedText.text = 'To kill: '+ killed + "/" + toKill;
 }
 
+function updateLives(_livesCount){
+	livesCount = _livesCount;
+	renderHearts();
+
+}
+
+function renderBuildings(){
+	renderHospital();
+	renderArmory();
+	renderBank();
+	ground.kill();
+	ground = platforms.create(0, game.world.height - 50, 'ground');
+	ground.scale.setTo(2, 2);
+	ground.body.immovable = true;
+	ground.physicsBodyType = Phaser.Physics.ARCADE;
+}
+
+function renderHospital(){
+	switch(hospitalLevel){
+		case 0:
+		break;
+		case 1:
+		hospital = game.add.sprite(0 ,game.height /2,'hospital1');
+		hospital.height = game.height / 2;
+		hospital.width = game.height / 2;
+		break;
+		case 2:
+		hospital = game.add.sprite(0 ,game.height /2,'hospital2');
+		hospital.height = game.height / 2;
+		hospital.width = game.height / 2;
+		break;
+		case 3:
+		hospital = game.add.sprite(0 ,game.height /2,'hospital3');
+		hospital.height = game.height / 2;
+		hospital.width = game.height / 2;
+		break;
+		case 4:
+		hospital = game.add.sprite(0 ,game.height /2,'hospital4');
+		hospital.height = game.height / 2;
+		hospital.width = game.height / 2;
+		break;
+		default:
+		hospital = game.add.sprite(0 ,game.height /2,'hospital5');
+		hospital.height = game.height / 2;
+		hospital.width = game.height / 2;
+		break;
+		hospital.smoothed = false;
+	}
+}
+
+function renderArmory(){
+	switch(armoryLevel){
+		case 0:
+		break;
+		case 1:
+		armory = game.add.sprite(game.width / 2 - 200 ,game.height /2,'armory1');
+		armory.height = game.height / 2;
+		armory.width = game.height / 2;
+		break;
+		case 2:
+		armory = game.add.sprite(game.width / 2 - 200 ,game.height /2,'armory2');
+		armory.height = game.height / 2;
+		armory.width = game.height / 2;
+		break;
+		case 3:
+		armory = game.add.sprite(game.width / 2 - 200 ,game.height /2,'armory3');
+		armory.height = game.height / 2;
+		armory.width = game.height / 2;
+		break;
+		case 4:
+		armory = game.add.sprite(game.width / 2 - 200 ,game.height /2,'armory4');
+		armory.height = game.height / 2;
+		armory.width = game.height / 2;
+		break;
+		default:
+		armory = game.add.sprite(game.width / 2 - 200 ,game.height /2,'armory5');
+		armory.height = game.height / 2;
+		armory.width = game.height / 2;
+		break;
+		armory.smoothed = false;
+	}
+}
+
+function renderBank(){
+	switch(bankLevel){
+		case 0:
+		break;
+		case 1:
+		bank = game.add.sprite(game.width / 2 + 300   ,game.height /2,'bank1');
+		bank.height = game.height / 2;
+		bank.width = game.height / 2;
+		break;
+		case 2:
+		bank = game.add.sprite(game.width / 2 + 300 ,game.height /2,'bank2');
+		bank.height = game.height / 2;
+		bank.width = game.height / 2;
+		break;
+		case 3:
+		bank = game.add.sprite(game.width / 2 + 300  ,game.height /2,'bank3');
+		bank.height = game.height / 2;
+		bank.width = game.height / 2;
+		break;
+		case 4:
+		bank = game.add.sprite(game.width / 2 + 300   ,game.height /2,'bank4');
+		bank.height = game.height / 2;
+		bank.width = game.height / 2;
+		break;
+		default:
+		bank = game.add.sprite(game.width / 2 + 300 ,game.height /2,'bank5');
+		bank.height = game.height / 2;
+		bank.width = game.height / 2;
+		break;
+		bank.smoothed = false;
+	}
+}
 function renderHearts(){
 	lives.forEach(function(live){
 		live.kill();
@@ -319,12 +439,6 @@ function renderHearts(){
 		live.width = 50;
 		live.height = 50;
 	}
-}
-
-function updateLives(_livesCount){
-	livesCount = _livesCount;
-	renderHearts();
-
 }
 
 function getShot(ai, coin){
