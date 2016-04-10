@@ -257,7 +257,10 @@ function levelUp(){
 
 function renderAis(){
 	for(var i = killed; i < toKill; i++){
-		ai = game.add.sprite(game.width-80, game.height-300, 'ai');
+		if(i % 2 == 0)
+			ai = game.add.sprite(game.width-(80+1), game.height-300, 'ai');
+		else
+			ai = game.add.sprite(80+i, game.height-300, 'ai');
 		game.physics.arcade.enable(ai);
 		ai.physicsBodyType = Phaser.Physics.ARCADE;
 		ai.body.bounce.y = 0;
@@ -268,7 +271,7 @@ function renderAis(){
 		ai.health = 5;
 		ai.lastLeft = false;
 		ais[i] = ai;
-		i++;
+		/*i++;
 		ai = game.add.sprite(80, game.height-300, 'ai');
 		game.physics.arcade.enable(ai);
 		ai.physicsBodyType = Phaser.Physics.ARCADE;
@@ -279,7 +282,7 @@ function renderAis(){
 		ai.width = 160;
 		ai.health = 5;
 		ai.lastLeft = false;
-		ais[i] = ai;
+		ais[i] = ai;*/
 	}
 }
 
@@ -331,7 +334,8 @@ function getShot(ai, coin){
 	ai.health -= coinPower;
 	if(ai.health <= 0){
 		ai.kill();
-		killed+=1;
+		killed += 1;
+		money += 1000 * bankLevel;
 		updateText();
 	}
 	if(killed >= toKill)
