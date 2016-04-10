@@ -15,21 +15,21 @@
 			<div class="element">
 				<img src="assets/images/hospital_tier5.png">
 				<span id="hospitalCost">99999$</span>
-				<button class="pure-button" id="buyHospital">Buy</button>
+				<button class="pure-button pure-button-disabled" id="buyHospital">Buy</button>
 			</div>
 		</div>
 		<div class="pure-u-1-3">
 			<div class="element">
 				<img src="assets/images/armory_tier5.png">
 				<span id="armoryCost">99999$</span>
-				<button class="pure-button" id="buyArmory">Buy</button>
+				<button class="pure-button pure-button-disabled" id="buyArmory">Buy</button>
 			</div>	
 		</div>
 		<div class="pure-u-1-3">
 			<div class="element">
 				<img src="assets/images/bank_tier5.png">
 				<span id="bankCost">99999$</span>
-				<button class="pure-button" id="buyBank">Buy</button>
+				<button class="pure-button pure-button-disabled" id="buyBank">Buy</button>
 			</div>
 	</div>
 	<button class="button-xlarge pure-button" id="nextLevelBtn">Next level</button>
@@ -51,6 +51,10 @@ var coin;
 var ai2;
 var lives;
 
+var money = 0;
+var hospitalLevel = 0;
+var armoryLevel = 0;
+var bankLevel = 0;
 var killed = 0;
 var toKill = 10;
 var killedText;
@@ -60,20 +64,54 @@ var lastLeft;
 var coinPower = 1;
 var ais = [];
 
-$("#nextLevelBtn").click(startNewLevel());
+$("#nextLevelBtn").click(function(){startNewLevel()});
+$("#buyHospital").click(function(){buyHospitalUpgrade()});
+$("#buyArmory").click(function(){buyArmoryUpgrade()});
+$("#buyBank").click(function(){buyBankUpgrade()});
 
 function startNewLevel(){
 	levelUp();
 	$(".nextLevelMenu").addClass("hidden");
-	game.paused = false;
 }
 
 function showNextLevelMenu(){
 	$(".nextLevelMenu").removeClass("hidden");
-	game.paused = true;
-	//$("#hospitalCost").text( + "$");
-	//$("#armoryCost").text( + "$");
-	//$("#bankCost").text( + "$");
+	$("#hospitalCost").text((hospitalLevel + 1) * 10000 + "$");
+	$("#armoryCost").text((armoryLevel + 1) * 10000 + "$");
+	$("#bankCost").text((bankLevel + 1) * 10000 + "$");
+	if((hospitalLevel + 1) * 10000) $("#buyHospital").addClass("pure-button-disabled");
+	else $("#buyHospital").removeClass("pure-button-disabled");
+	if((armoryLevel + 1) * 10000) $("#buyArmory").addClass("pure-button-disabled");
+	else $("#buyArmory").removeClass("pure-button-disabled");
+	if((bankLevel + 1) * 10000) $("#buyBank").addClass("pure-button-disabled");
+	else $("#buyBank").removeClass("pure-button-disabled");
+}
+
+function buyHospitalUpgrade(){
+	if((hospitalLevel + 1) * 10000 <= money){
+		money -= (hospitalLevel + 1) * 10000;
+		hospitalLevel++;
+		livesCount++;
+		renderHearts();
+		showNextLevelMenu();
+	}
+}
+
+function buyArmoryUpgrade(){
+	if((armoryLevel + 1) * 10000 <= money){
+		money -= (armoryLevel + 1) * 10000;
+		armoryLevel++;
+		coinPower++;
+		showNextLevelMenu();
+	}
+}
+
+function buyBankUpgrade(){
+	if((bankLevel + 1) * 10000 <= money){
+		money -= (bankLevel + 1) * 10000;
+		bankLevel++;
+		showNextLevelMenu();
+	}
 }
 
 function preload() {
