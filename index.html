@@ -17,52 +17,137 @@
 var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update });
 var cursors;
 var character;
+var platforms;
+var ground;
+var hearts;
+
+var killed = 0;
+var toKill = 10;
+var killedText;
+var livesCount = 3;
+var levelText;
+
 function preload() {
-	//game.stage.backgroundColor = '#fff';
-	game.load.spritesheet('character', 'assets/sprites/character.png', 80, 80);
+	game.stage.backgroundColor = '#fff';
+	game.load.image('background', 'assets/images/bg.png');
+	game.load.image('ground', 'assets/images/street_bottom.png');
+	game.load.image('live', 'assets/images/live.png');
+	game.load.spritesheet('character', 'assets/sprites/player.png', 80, 80);
 }
 
 function create() {
-	character = game.add.sprite(game.width/2,game.height-45,'character');
+
+	levelUpKey = game.input.keyboard.addKey(Phaser.Keyboard.Z);
+
+	game.physics.startSystem(Phaser.Physics.ARCADE);
+
+	var bg = game.add.sprite(0, 0, 'background');
+	bg.height = game.height;
+	bg.width = game.width;
+	bg.smoothed = false;
+
+	lives = game.add.group();
+
+	for(var i = 1; i <= livesCount; i++){
+		var live = lives.create(game.width-(30*i), 10, 'live');
+		live.width = 30;
+		live.height = 30;
+		console.log("x: "+live.x+" y: "+live.y);
+	}
+
+	platforms = game.add.group();
+    platforms.enableBody = true;
+	ground = platforms.create(0, game.world.height - 50, 'ground');
+	ground.scale.setTo(2, 2);
+	ground.body.immovable = true;
+	ground.physicsBodyType = Phaser.Physics.ARCADE;
+
+	character = game.add.sprite(game.width/2,game.height-150,'character');
 	character.animations.add('right', [13, 14], 12, true);
-	character.animations.add('left', [16, 15], 12, true);
+	character.animations.add('left', [29, 28], 12, true);
 	character.animations.add('jump',[2, 3], true);
 	character.animations.add('idle', [0], true);
 	character.animations.add('fall', [5], true);
 	character.animations.add('onAir', [4], true);
-	game.physics.startSystem(Phaser.Physics.ARCADE);
 	game.physics.arcade.enable(character);
+	character.physicsBodyType = Phaser.Physics.ARCADE;
 
-    //  Player physics properties. Give the little guy a slight bounce.
     character.body.bounce.y = 0.2;
     character.body.gravity.y = 500;
     character.body.collideWorldBounds = true;
 
-	//walk.enableUpdate = true;
-	//character.animations.play('walk',5, true);
+    levelText = game.add.text(16, 10, 'Level ' + toKill/10, { fontSize: '32px', fill: '#000' });
+    killedText = game.add.text(16, 40, 'To kill: '+ killed + "/" + toKill, { fontSize: '32px', fill: '#000' });
+    //livesText = game.add.test(game.width-16, 10, '')
 }
 
 function update() {
+
+	game.physics.arcade.overlap(character, ground, collisionHandler, null, this);
+	game.physics.arcade.collide(character, platforms);
+
 	character.body.velocity.x = 0;
 	cursors = game.input.keyboard.createCursorKeys();
-	if (cursors.up.isDown){
+	if (cursors.up.isDown && character.body.touching.down){
 		character.animations.play('jump');
 		character.frame = 4;
 		character.body.velocity.y = -350;
 	}
+	if(cursors.up.isDown && character.body.touching.down){
+		character.animations.play('jump');
+		character.body.velocity.y = -350;
+	}
 	if(cursors.right.isDown){
 		character.animations.play('right');
+		//character.frame = 13;
 		character.body.velocity.x = 100;
 	}
 	if(cursors.left.isDown){
 		character.animations.play('left');
+		//character.frame = 15;
 		character.body.velocity.x = -100;
+	}
+	if(cursors.left.isUp){
+		character.animations.play()
 	}
 	if(cursors.left.isUp && cursors.right.isUp && cursors.up.isUp)
 	{
 		//character.animations.play('idle');
+		character.animations.stop();
 		character.animations.play('fall');
 	}
+	/*if(game.physics.arcade.collide(character, platforms)){
+		character.animations.play('idle');
+	}*/
+	if(cursors.left.isUp && cursors.right.isUp && cursors.up.isUp && character.body.touching.down){
+		character.animations.stop();
+		character.animations.play('idle');
+	}
+	if(levelUpKey.isDown){
+		levelUp();
+	}
+	//game.physics.arcade.overlap(character, ground, isTouchingGround, null, this)
+}
+//function isTouchingGround(character, ground){
+//	character.animations.play('iddle');
+//}
+function collisionHandler(character, ground){
+	//character.animations.play('idle');
+}
+
+function levelUp(){
+	console.log("ok");
+	toKill += 10;
+	updateText();
+}
+
+function updateText(){
+	levelText.text = 'Level ' + toKill/10;
+    killedText.text = 'To kill: '+ killed + "/" + toKill;
+}
+
+function updateLives(_lives){
+	lives = _lives;
 }
 
 </script>
