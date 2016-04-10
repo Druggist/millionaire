@@ -55,22 +55,25 @@ var killed = 0;
 var toKill = 10;
 var killedText;
 var livesCount = 3;
-var levelText;
+var levelText = "";
 var lastLeft;
 var coinPower = 1;
 var ais = [];
 
+$("#nextLevelBtn").click(startNewLevel());
+
 function startNewLevel(){
 	levelUp();
 	$(".nextLevelMenu").addClass("hidden");
+	game.paused = false;
 }
 
 function showNextLevelMenu(){
-	game.pause();
+	$(".nextLevelMenu").removeClass("hidden");
+	game.paused = true;
 	//$("#hospitalCost").text( + "$");
 	//$("#armoryCost").text( + "$");
 	//$("#bankCost").text( + "$");
-	$(".nextLevelMenu").removeClass("hidden");
 }
 
 function preload() {
