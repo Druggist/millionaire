@@ -42,6 +42,7 @@
 var game = new Phaser.Game(window.innerWidth, window.innerHeight , Phaser.AUTO, '', { preload: preload, create: create, update: update });
 var cursors;
 var character;
+var playerCollider;
 var platforms;
 var ground;
 var coins;
@@ -51,6 +52,7 @@ var lives;
 var hospital;
 var armory;
 var bank;
+var characterZoom = 2;
 
 var money = 99999999;
 var hospitalLevel = 0;
@@ -140,6 +142,7 @@ function preload() {
 	game.load.image('bank3', 'assets/images/bank_tier3.png');
 	game.load.image('bank4', 'assets/images/bank_tier4.png');
 	game.load.image('bank5', 'assets/images/bank_tier5.png');
+	game.load.image('charCollider', 'assets/sprites/character_collider.png');
 	game.load.spritesheet('ai', 'assets/sprites/ai.png', 80, 80);
 	game.load.spritesheet('character', 'assets/sprites/player.png', 80, 80);
 }
@@ -192,12 +195,19 @@ function create() {
 
 	game.physics.arcade.enable(character);
 	character.physicsBodyType = Phaser.Physics.ARCADE;
-
     character.body.bounce.y = 0;
     character.body.gravity.y = 300;
     character.body.collideWorldBounds = false;
-    character.height = 160;
-    character.width = 160;
+    character.height *= characterZoom;
+    character.width *= characterZoom;
+    playerCollider = game.add.sprite(character.x, character.y, 'charCollider');
+    game.physics.arcade.enable(playerCollider);
+    playerCollider.physicsBodyType = Phaser.Physics.ARCADE;
+	playerCollider.body.bounce.y = 0;
+	playerCollider.texture.baseTexture.skipRender = false;
+    playerCollider.height *= characterZoom;
+    playerCollider.width *= characterZoom;
+    character.collider = playerCollider;
 
 
     levelText = game.add.text(16, 10, 'Level ' + toKill/10, { fontSize: '32px', fill: '#000' });
@@ -206,12 +216,14 @@ function create() {
 
 function update() {
 
+	game.physics.arcade.collide(playerCollider, platforms);
 	game.physics.arcade.collide(character, platforms);
 	game.physics.arcade.collide(ais, platforms);
 	game.physics.arcade.collide(aiColliders, platforms);
-	game.physics.arcade.collide(character, aiColliders);
+	game.physics.arcade.collide(playerCollider, aiColliders);
 	game.physics.arcade.overlap(aiColliders, coins, getShot, null, this);
 
+	character.body.velocity.x = 0;
 	character.body.velocity.x = 0;
 	ai.body.velocity.x = 0;
 
@@ -226,12 +238,12 @@ function update() {
 			character.animations.play('rJump');
 		character.body.velocity.y = -350;
 	}
-	if(cursors.right.isDown){
+	if(cursors.right.isDown && !playerCollider.body.touching.right){
 		character.animations.play('right');
 		character.body.velocity.x = 100;
 		lastLeft = false;
 	}
-	if(cursors.left.isDown){
+	if(cursors.left.isDown && !playerCollider.body.touching.left){
 		character.animations.play('left');
 		character.body.velocity.x = -100;
 		lastLeft = true;
@@ -252,6 +264,8 @@ function update() {
 	if(levelUpKey.isDown){
 		levelUp();
 	}
+	playerCollider.x = character.x + character.width/2 - playerCollider.width/2;
+	playerCollider.y = character.y + character.height/2 - playerCollider.height/2;
 }
 
 function levelUp(){
@@ -265,7 +279,7 @@ function levelUp(){
 function renderAis(){
 	for(var i = killed; i < toKill; i++){
 		if(i % 2 == 0)
-			ai = game.add.sprite(game.width-(80+1), game.height-300, 'ai');
+			ai = game.add.sprite(game.width-(80+i), game.height-300, 'ai');
 		else
 			ai = game.add.sprite(80+i, game.height-300, 'ai');
 
@@ -274,21 +288,21 @@ function renderAis(){
 		ai.body.bounce.y = 0;
 		ai.body.gravity.y = 500;
 		ai.body.collideWorldBounds = true;
-		ai.height = 160;
-		ai.width = 160;
+		ai.height *= characterZoom;
+		ai.width *= characterZoom;
 		ai.health = 5;
 		ai.lastLeft = false;
 
 		ai.animations.add('right', [0, 1, 2], 12, true);
 		ai.animations.add('left', [3, 4, 5], 12, true);
 
-		aiCollider = game.add.sprite(ai.x, ai.y, 'ai');
+		aiCollider = game.add.sprite(ai.x, ai.y, 'charCollider');
 		game.physics.arcade.enable(aiCollider);
 		aiCollider.physicsBodyType = Phaser.Physics.ARCADE;
 		aiCollider.body.bounce.y = 0;
 		aiCollider.texture.baseTexture.skipRender = false;
-		aiCollider.height = ai.height/2;
-		aiCollider.width = ai.width/2;
+		aiCollider.height *= characterZoom;
+		aiCollider.width *= characterZoom;
 		ai.collider = aiCollider;
 		ai.colX = i;
 		ais[i] = ai;
@@ -298,12 +312,12 @@ function renderAis(){
 
 function updateAis(ais){
 	ais.forEach(function(ai){
-		if(ai.collider.x > character.x + character.width && !aiColliders[ai.colX].body.touching.left){
+		if(ai.collider.x > character.collider.x + character.collider.width && !aiColliders[ai.colX].body.touching.left){
 			ai.animations.play('left');
 			ai.body.velocity.x = -50;
 			lastLeft = true;
 		}
-		else if( ai.collider.x + ai.collider.width < character.x && !aiColliders[ai.colX].body.touching.right){
+		else if( ai.collider.x + ai.collider.width < character.collider.x && !aiColliders[ai.colX].body.touching.right){
 			ai.animations.play('right');
 			ai.body.velocity.x = 50;
 			lastLeft = false;
