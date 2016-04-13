@@ -312,12 +312,12 @@ function renderAis(){
 
 function updateAis(ais){
 	ais.forEach(function(ai){
-		if(ai.collider.x > character.collider.x + character.collider.width && !aiColliders[ai.colX].body.touching.left){
+		if(ai.collider.x - ai.width/2 > character.collider.x + character.collider.width && !aiColliders[ai.colX].body.touching.left){
 			ai.animations.play('left');
 			ai.body.velocity.x = -50;
 			lastLeft = true;
 		}
-		else if( ai.collider.x + ai.collider.width < character.collider.x && !aiColliders[ai.colX].body.touching.right){
+		else if( ai.collider.x + ai.collider.width < character.collider.x - character.width/2 && !aiColliders[ai.colX].body.touching.right){
 			ai.animations.play('right');
 			ai.body.velocity.x = 50;
 			lastLeft = false;
