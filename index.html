@@ -297,19 +297,23 @@ function renderAis(){
 
 function updateAis(ais){
 	ais.forEach(function(ai){
-		if(ai.x > character.x && !ai.body.touching.left){
+		if(ai.collider.x > character.x + character.width && !aiColliders[ai.colX].body.touching.left){
 			ai.animations.play('left');
 			ai.body.velocity.x = -50;
 			lastLeft = true;
 		}
-		else if(ai.x < character.x && !ai.body.touching.right){
+		else if( ai.collider.x + ai.collider.width < character.x && !aiColliders[ai.colX].body.touching.right){
 			ai.animations.play('right');
 			ai.body.velocity.x = 50;
 			lastLeft = false;
-		}else if(game.physics.arcade.collide(character, ais)){
+		}else if(game.physics.arcade.collide(character, ai.aiColliders)){
 			//ai.animations.play('attack');
 			ai.body.velocity.x = 0;
+			aiColliders[ai.colX].body.velocity.x = 0;
 			updateLives(livesCount-1);
+		}else{
+			ai.body.velocity.x = 0;
+			ai.animations.stop();
 		}
 		aiColliders[ai.colX].x = ai.x + ai.width/2 - aiColliders[ai.colX].width/2;
 		aiColliders[ai.colX].y = ai.y + ai.height/2 - aiColliders[ai.colX].height/2;
