@@ -143,8 +143,8 @@ function preload() {
 	game.load.image('bank4', 'assets/images/bank_tier4.png');
 	game.load.image('bank5', 'assets/images/bank_tier5.png');
 	game.load.image('charCollider', 'assets/sprites/character_collider.png');
-	game.load.spritesheet('ai', 'assets/sprites/ai.png', 80, 80);
-	game.load.spritesheet('character', 'assets/sprites/player.png', 80, 80);
+	game.load.spritesheet('ai', 'assets/sprites/ai.png', 80, 81);
+	game.load.spritesheet('character', 'assets/sprites/player.png', 80, 81);
 }
 
 function create() {
@@ -278,10 +278,11 @@ function levelUp(){
 
 function renderAis(){
 	for(var i = killed; i < toKill; i++){
-		if(i % 2 == 0)
-			ai = game.add.sprite(game.width-(80+i), game.height-300, 'ai');
+		if(i % 2 == 0){
+			ai = game.add.sprite(game.width - 200 - i*5, game.height-300, 'ai');}
 		else
-			ai = game.add.sprite(80+i, game.height-300, 'ai');
+			ai = game.add.sprite(80+i*5, game.height-300, 'ai');
+
 
 		game.physics.arcade.enable(ai);
 		ai.physicsBodyType = Phaser.Physics.ARCADE;
