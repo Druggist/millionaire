@@ -64,6 +64,9 @@ var levelText = "";
 var lastLeft;
 var coinPower = 10;
 var ais = [];
+var aiCollider;
+var aiColliders = [];
+
 
 $("#nextLevelBtn").click(function(){startNewLevel()});
 $("#buyHospital").click(function(){buyHospitalUpgrade()});
@@ -151,7 +154,7 @@ function create() {
 	var bg = game.add.sprite(0, 0, 'background');
 	bg.height = game.height;
 	bg.width = game.width;
-	bg.smoothed = false;
+	//bg.smoothed = false;
 
 	coins = game.add.group();
 	coins.enableBody = true;
@@ -187,9 +190,6 @@ function create() {
 	renderAis();
 
 
-	//ais = game.add.group();
-	//game.physics.arcade.enable(ai);
-
 	game.physics.arcade.enable(character);
 	character.physicsBodyType = Phaser.Physics.ARCADE;
 
@@ -208,10 +208,12 @@ function update() {
 
 	game.physics.arcade.collide(character, platforms);
 	game.physics.arcade.collide(ais, platforms);
-	game.physics.arcade.collide(ais, character);
-	game.physics.arcade.overlap(ais, coins, getShot, null, this);
+	game.physics.arcade.collide(aiColliders, platforms);
+	game.physics.arcade.collide(character, aiColliders);
+	game.physics.arcade.overlap(aiColliders, coins, getShot, null, this);
 
 	character.body.velocity.x = 0;
+	ai.body.velocity.x = 0;
 
 	cursors = game.input.keyboard.createCursorKeys();
 	shootKey.onDown.add(shoot, this);
@@ -250,7 +252,6 @@ function update() {
 	if(levelUpKey.isDown){
 		levelUp();
 	}
-	//game.physics.arcade.overlap(character, ground, isTouchingGround, null, this)
 }
 
 function levelUp(){
@@ -261,11 +262,12 @@ function levelUp(){
 }
 
 function renderAis(){
-	for(var i = killed; i < toKill; i++){
+	for(var i = killed; i < 1; i++){
 		if(i % 2 == 0)
 			ai = game.add.sprite(game.width-(80+1), game.height-300, 'ai');
 		else
 			ai = game.add.sprite(80+i, game.height-300, 'ai');
+
 		game.physics.arcade.enable(ai);
 		ai.physicsBodyType = Phaser.Physics.ARCADE;
 		ai.body.bounce.y = 0;
@@ -275,31 +277,33 @@ function renderAis(){
 		ai.width = 160;
 		ai.health = 5;
 		ai.lastLeft = false;
+
+		ai.animations.add('right', [0, 1, 2], 12, true);
+		ai.animations.add('left', [3, 4, 5], 12, true);
+
+		aiCollider = game.add.sprite(ai.x, ai.y, 'ai');
+		game.physics.arcade.enable(aiCollider);
+		aiCollider.physicsBodyType = Phaser.Physics.ARCADE;
+		aiCollider.body.bounce.y = 0;
+		aiCollider.texture.baseTexture.skipRender = false;
+		aiCollider.height = ai.height/2;
+		aiCollider.width = ai.width/2;
+		ai.collider = aiCollider;
+		ai.colX = i;
 		ais[i] = ai;
-		/*i++;
-		ai = game.add.sprite(80, game.height-300, 'ai');
-		game.physics.arcade.enable(ai);
-		ai.physicsBodyType = Phaser.Physics.ARCADE;
-		ai.body.bounce.y = 0;
-		ai.body.gravity.y = 500;
-		ai.body.collideWorldBounds = true;
-		ai.height = 160;
-		ai.width = 160;
-		ai.health = 5;
-		ai.lastLeft = false;
-		ais[i] = ai;*/
+		aiColliders[i] = aiCollider;
 	}
 }
 
 function updateAis(ais){
 	ais.forEach(function(ai){
 		if(ai.x > character.x && !ai.body.touching.left){
-			//ai.animations.play('left');
+			ai.animations.play('left');
 			ai.body.velocity.x = -50;
 			lastLeft = true;
 		}
 		else if(ai.x < character.x && !ai.body.touching.right){
-			//ai.animations.play('right');
+			ai.animations.play('right');
 			ai.body.velocity.x = 50;
 			lastLeft = false;
 		}else if(game.physics.arcade.collide(character, ais)){
@@ -307,6 +311,9 @@ function updateAis(ais){
 			ai.body.velocity.x = 0;
 			updateLives(livesCount-1);
 		}
+		aiColliders[ai.colX].x = ai.x + ai.width/2 - aiColliders[ai.colX].width/2;
+		aiColliders[ai.colX].y = ai.y + ai.height/2 - aiColliders[ai.colX].height/2;
+		aiColliders[ai.colX].body.velocity = ai.body.velocity;
 	});
 }
 
@@ -437,13 +444,12 @@ function renderHearts(){
 	}
 }
 
-function getShot(ai, coin){
-	//ai.kill();
+function getShot(aiColliders, coin){
 	coin.kill();
-	//console.log(ai.health);
 	ai.health -= coinPower;
 	if(ai.health <= 0){
 		ai.kill();
+		ai.collider.kill();
 		killed += 1;
 		money += 1000 * bankLevel;
 		updateText();
@@ -459,8 +465,6 @@ function shoot(){
 		character.animations.play('rShoot');
 		coin = coins.create(character.x + 170, character.y + character.width/2, 'coin');
 	}
-
-	//coin = coins.create(character.x + 20, character.y + character.width/2, 'coin');
 	coin.width = 20;
 	coin.height = 20;
 
