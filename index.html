@@ -445,12 +445,13 @@ function renderHearts(){
 	}
 }
 
-function getShot(aiColliders, coin){
+function getShot(aiCollider, coin){
 	coin.kill();
+	var index = aiColliders.indexOf(aiCollider);
 	ai.health -= coinPower;
 	if(ai.health <= 0){
-		ai.kill();
-		ai.collider.kill();
+		ais[index].collider.kill();
+		ais[index].kill();
 		killed += 1;
 		money += 1000 * bankLevel;
 		updateText();
