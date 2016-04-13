@@ -220,7 +220,7 @@ function update() {
 	game.physics.arcade.collide(character, platforms);
 	game.physics.arcade.collide(ais, platforms);
 	game.physics.arcade.collide(aiColliders, platforms);
-	game.physics.arcade.collide(playerCollider, aiColliders);
+	game.physics.arcade.collide(character, aiColliders);
 	game.physics.arcade.overlap(aiColliders, coins, getShot, null, this);
 
 	character.body.velocity.x = 0;
