@@ -259,10 +259,11 @@ function levelUp(){
 	killed = 0;
 	updateText();
 	renderAis();
+	preload();
 }
 
 function renderAis(){
-	for(var i = killed; i < 1; i++){
+	for(var i = killed; i < toKill; i++){
 		if(i % 2 == 0)
 			ai = game.add.sprite(game.width-(80+1), game.height-300, 'ai');
 		else
@@ -306,18 +307,14 @@ function updateAis(ais){
 			ai.animations.play('right');
 			ai.body.velocity.x = 50;
 			lastLeft = false;
-		}else if(game.physics.arcade.collide(character, ai.aiColliders)){
-			//ai.animations.play('attack');
+		}else{
 			ai.body.velocity.x = 0;
 			aiColliders[ai.colX].body.velocity.x = 0;
 			updateLives(livesCount-1);
-		}else{
-			ai.body.velocity.x = 0;
 			ai.animations.stop();
 		}
 		aiColliders[ai.colX].x = ai.x + ai.width/2 - aiColliders[ai.colX].width/2;
 		aiColliders[ai.colX].y = ai.y + ai.height/2 - aiColliders[ai.colX].height/2;
-		aiColliders[ai.colX].body.velocity = ai.body.velocity;
 	});
 }
 
