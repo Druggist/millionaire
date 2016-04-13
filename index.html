@@ -78,6 +78,12 @@ $("#buyBank").click(function(){buyBankUpgrade()});
 function startNewLevel(){
 	renderBuildings();
 	levelUp();
+	if(character != null) character.destroy();
+	if(coin != null) coin.destroy();
+	if(coins != null) coins.destroy();
+	coins = game.add.group();
+	coins.enableBody = true;
+	renderPlayer();
 	$(".nextLevelMenu").addClass("hidden");
 }
 
@@ -174,40 +180,9 @@ function create() {
 	ground.scale.setTo(2, 2);
 	ground.body.immovable = true;
 	ground.physicsBodyType = Phaser.Physics.ARCADE;
-
-	character = game.add.sprite(game.width/2,game.height-300,'character');
-	character.animations.add('right', [13, 14], 12, true);
-	character.animations.add('left', [29, 28], 12, true);
-	character.animations.add('rJump',[2, 3], true);
-	character.animations.add('lJump',[17, 18], true);
-	character.animations.add('lIdle', [15], true);
-	character.animations.add('rIdle', [0], true);
-	character.animations.add('rFall', [5], true);
-	character.animations.add('lFall', [20], true);
-	character.animations.add('rOnAir', [4], true);
-	character.animations.add('lOnAir', [19], true);
-	character.animations.add('lShoot', [21, 22, 23, 24], 20, true);
-	character.animations.add('rShoot', [6, 7, 8, 9], 20, true);
-
-
 	renderAis();
+	renderPlayer();
 
-
-	game.physics.arcade.enable(character);
-	character.physicsBodyType = Phaser.Physics.ARCADE;
-    character.body.bounce.y = 0;
-    character.body.gravity.y = 300;
-    character.body.collideWorldBounds = false;
-    character.height *= characterZoom;
-    character.width *= characterZoom;
-    playerCollider = game.add.sprite(character.x, character.y, 'charCollider');
-    game.physics.arcade.enable(playerCollider);
-    playerCollider.physicsBodyType = Phaser.Physics.ARCADE;
-	playerCollider.body.bounce.y = 0;
-	playerCollider.texture.baseTexture.skipRender = false;
-    playerCollider.height *= characterZoom;
-    playerCollider.width *= characterZoom;
-    character.collider = playerCollider;
 
 
     levelText = game.add.text(16, 10, 'Level ' + toKill/10, { fontSize: '32px', fill: '#000' });
@@ -274,6 +249,37 @@ function levelUp(){
 	updateText();
 	renderAis();
 	preload();
+}
+
+function renderPlayer(){
+	character = game.add.sprite(game.width/2,game.height-300,'character');
+	character.animations.add('right', [13, 14], 12, true);
+	character.animations.add('left', [29, 28], 12, true);
+	character.animations.add('rJump',[2, 3], true);
+	character.animations.add('lJump',[17, 18], true);
+	character.animations.add('lIdle', [15], true);
+	character.animations.add('rIdle', [0], true);
+	character.animations.add('rFall', [5], true);
+	character.animations.add('lFall', [20], true);
+	character.animations.add('rOnAir', [4], true);
+	character.animations.add('lOnAir', [19], true);
+	character.animations.add('lShoot', [21, 22, 23, 24], 20, true);
+	character.animations.add('rShoot', [6, 7, 8, 9], 20, true);
+	game.physics.arcade.enable(character);
+	character.physicsBodyType = Phaser.Physics.ARCADE;
+    character.body.bounce.y = 0;
+    character.body.gravity.y = 300;
+    character.body.collideWorldBounds = false;
+    character.height *= characterZoom;
+    character.width *= characterZoom;
+    playerCollider = game.add.sprite(character.x, character.y, 'charCollider');
+    game.physics.arcade.enable(playerCollider);
+    playerCollider.physicsBodyType = Phaser.Physics.ARCADE;
+	playerCollider.body.bounce.y = 0;
+	playerCollider.texture.baseTexture.skipRender = false;
+    playerCollider.height *= characterZoom;
+    playerCollider.width *= characterZoom;
+    character.collider = playerCollider;
 }
 
 function renderAis(){
@@ -360,21 +366,25 @@ function renderHospital(){
 		hospital.width = game.height / 2;
 		break;
 		case 2:
+		if(hospital != null) hospital.destroy();
 		hospital = game.add.sprite(0 ,game.height /2 - 50,'hospital2');
 		hospital.height = game.height / 2;
 		hospital.width = game.height / 2;
 		break;
 		case 3:
+		if(hospital != null) hospital.destroy();
 		hospital = game.add.sprite(0 ,game.height /2 - 50,'hospital3');
 		hospital.height = game.height / 2;
 		hospital.width = game.height / 2;
 		break;
 		case 4:
+		if(hospital != null) hospital.destroy();
 		hospital = game.add.sprite(0 ,game.height /2 - 50,'hospital4');
 		hospital.height = game.height / 2;
 		hospital.width = game.height / 2;
 		break;
 		default:
+		if(hospital != null) hospital.destroy();
 		hospital = game.add.sprite(0 ,game.height /2 - 50,'hospital5');
 		hospital.height = game.height / 2;
 		hospital.width = game.height / 2;
@@ -393,21 +403,25 @@ function renderArmory(){
 		armory.width = game.height / 2;
 		break;
 		case 2:
+		if(armory != null) armory.destroy();
 		armory = game.add.sprite(game.width / 2 - 200 ,game.height /2 - 50,'armory2');
 		armory.height = game.height / 2;
 		armory.width = game.height / 2;
 		break;
 		case 3:
+		if(armory != null) armory.destroy();
 		armory = game.add.sprite(game.width / 2 - 200 ,game.height /2 - 50,'armory3');
 		armory.height = game.height / 2;
 		armory.width = game.height / 2;
 		break;
 		case 4:
+		if(armory != null) armory.destroy();
 		armory = game.add.sprite(game.width / 2 - 200 ,game.height /2 - 50,'armory4');
 		armory.height = game.height / 2;
 		armory.width = game.height / 2;
 		break;
 		default:
+		if(armory != null) armory.destroy();
 		armory = game.add.sprite(game.width / 2 - 200 ,game.height /2 - 50,'armory5');
 		armory.height = game.height / 2;
 		armory.width = game.height / 2;
@@ -421,27 +435,30 @@ function renderBank(){
 		case 0:
 		break;
 		case 1:
-		bank = game.add.sprite(game.width / 2 + 300   ,game.height /2 - 50,'bank1');
+		bank = game.add.sprite(game.width / 2 + 300, game.height /2 - 50, 'bank1');
 		bank.height = game.height / 2;
 		bank.width = game.height / 2;
-		bank.z = -2;
 		break;
 		case 2:
+		if(bank != null) bank.destroy();
 		bank = game.add.sprite(game.width / 2 + 300 ,game.height /2 - 50,'bank2');
 		bank.height = game.height / 2;
 		bank.width = game.height / 2;
 		break;
 		case 3:
+		if(bank != null) bank.destroy();
 		bank = game.add.sprite(game.width / 2 + 300  ,game.height /2 - 50,'bank3');
 		bank.height = game.height / 2;
 		bank.width = game.height / 2;
 		break;
 		case 4:
+		if(bank != null) bank.destroy();
 		bank = game.add.sprite(game.width / 2 + 300   ,game.height /2 - 50,'bank4');
 		bank.height = game.height / 2;
 		bank.width = game.height / 2;
 		break;
 		default:
+		if(bank != null) bank.destroy();
 		bank = game.add.sprite(game.width / 2 + 300 ,game.height /2 - 50,'bank5');
 		bank.height = game.height / 2;
 		bank.width = game.height / 2;
@@ -461,7 +478,7 @@ function renderHearts(){
 }
 
 function getShot(aiCollider, coin){
-	coin.kill();
+	if(coin != null) coin.destroy();
 	var index = aiColliders.indexOf(aiCollider);
 	ai.health -= coinPower;
 	if(ai.health <= 0){
