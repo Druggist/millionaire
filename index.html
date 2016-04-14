@@ -45,16 +45,18 @@ var character;
 var playerCollider;
 var platforms;
 var ground;
-var coins;
 var ai;
+var coins;
 var coin;
+var dollar;
 var lives;
 var hospital;
 var armory;
 var bank;
 var characterZoom = 2;
 
-var money = 99999999;
+var money = 0;
+var dollarValue = 100;
 var hospitalLevel = 0;
 var armoryLevel = 0;
 var bankLevel = 0;
@@ -63,9 +65,11 @@ var toKill = 10;
 var killedText = "";
 var livesCount = 5;
 var levelText = "";
+var dollarsText = "";
 var lastLeft;
 var coinPower = 10;
 var ais = [];
+var dollars = [];
 var aiCollider;
 var aiColliders = [];
 
@@ -133,6 +137,7 @@ function preload() {
 	game.load.image('ground', 'assets/images/street_bottom.png');
 	game.load.image('live', 'assets/images/live.png');
 	game.load.image('coin', 'assets/images/money.png');
+	game.load.image('dollar', 'assets/images/money2.png');
 	game.load.image('hospital1', 'assets/images/hospital_tier1.png');
 	game.load.image('hospital2', 'assets/images/hospital_tier2.png');
 	game.load.image('hospital3', 'assets/images/hospital_tier3.png');
@@ -174,6 +179,8 @@ function create() {
 	renderHearts();
 	renderBuildings();
 
+	renderDollar();
+
 	platforms = game.add.group();
     platforms.enableBody = true;
 	ground = platforms.create(0, game.world.height - 50, 'ground');
@@ -185,16 +192,22 @@ function create() {
 
     levelText = game.add.text(16, 10, 'Level ' + toKill/10, { fontSize: '32px', fill: '#000' });
     killedText = game.add.text(16, 40, 'To kill: '+ killed + "/" + toKill, { fontSize: '32px', fill: '#000' });
+    dollarsText = game.add.text(16, 70, 'Money: '+ money +  "$", { fontSize: '32px', fill: '#000' });
+
+    game.time.events.repeat(Phaser.Timer.SECOND * 2 / (bankLevel != 0 ? bankLevel : 0.5), 2000000, renderDollar, this);
 }
 
 function update() {
 
 	game.physics.arcade.collide(playerCollider, platforms);
+	game.physics.arcade.collide(dollars, platforms);
 	game.physics.arcade.collide(character, platforms);
 	game.physics.arcade.collide(ais, platforms);
 	game.physics.arcade.collide(aiColliders, platforms);
 	game.physics.arcade.collide(playerCollider, aiColliders);
 	game.physics.arcade.overlap(aiColliders, coins, getShot, null, this);
+	game.physics.arcade.overlap(aiColliders, dollars, stealDollar, null, this);
+	game.physics.arcade.overlap(playerCollider, dollars, pickUpDollar, null, this);
 
 	playerCollider.body.velocity.x = 0;
 	ai.body.velocity.x = 0;
@@ -248,6 +261,26 @@ function levelUp(){
 	preload();
 }
 
+function renderDollar(){
+	dollar = game.add.sprite(game.world.randomX, 0, 'dollar');
+	game.physics.enable(dollar, Phaser.Physics.ARCADE);
+	dollar.height = 25; 
+	dollar.width = 50; 
+	dollar.body.bounce.y = 0.1;
+	dollar.body.gravity.y = 100;
+	dollars.push(dollar);
+}
+
+function pickUpDollar(playerCollider, dollar){
+	if(dollar != null) dollar.destroy();
+	money += dollarValue;
+	dollarsText.text = 'Money: '+ money +  "$";
+}
+
+function stealDollar(aiCollider, dollar){
+	if(dollar != null) dollar.destroy();
+}
+
 function renderPlayer(){
 	character = game.add.sprite(game.width/2,game.height-300,'character');
 	character.animations.add('right', [13, 14], 12, true);
@@ -266,12 +299,12 @@ function renderPlayer(){
 	character.physicsBodyType = Phaser.Physics.ARCADE;
     character.body.bounce.y = 0;
     character.body.gravity.y = 0;
-    character.body.collideWorldBounds = false;
     character.height *= characterZoom;
     character.width *= characterZoom;
     playerCollider = game.add.sprite(character.x, character.y, 'charCollider');
     game.physics.arcade.enable(playerCollider);
     playerCollider.physicsBodyType = Phaser.Physics.ARCADE;
+    playerCollider.body.collideWorldBounds = true;
 	playerCollider.body.bounce.y = 0;
     playerCollider.body.gravity.y = 300;
 	playerCollider.texture.baseTexture.skipRender = false;
