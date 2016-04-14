@@ -265,7 +265,7 @@ function renderPlayer(){
 	game.physics.arcade.enable(character);
 	character.physicsBodyType = Phaser.Physics.ARCADE;
     character.body.bounce.y = 0;
-    character.body.gravity.y = 300;
+    character.body.gravity.y = 0;
     character.body.collideWorldBounds = false;
     character.height *= characterZoom;
     character.width *= characterZoom;
@@ -273,6 +273,7 @@ function renderPlayer(){
     game.physics.arcade.enable(playerCollider);
     playerCollider.physicsBodyType = Phaser.Physics.ARCADE;
 	playerCollider.body.bounce.y = 0;
+    playerCollider.body.gravity.y = 300;
 	playerCollider.texture.baseTexture.skipRender = false;
     playerCollider.height *= characterZoom;
     playerCollider.width *= characterZoom;
