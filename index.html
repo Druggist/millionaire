@@ -183,8 +183,6 @@ function create() {
 	renderAis();
 	renderPlayer();
 
-
-
     levelText = game.add.text(16, 10, 'Level ' + toKill/10, { fontSize: '32px', fill: '#000' });
     killedText = game.add.text(16, 40, 'To kill: '+ killed + "/" + toKill, { fontSize: '32px', fill: '#000' });
 }
@@ -195,32 +193,31 @@ function update() {
 	game.physics.arcade.collide(character, platforms);
 	game.physics.arcade.collide(ais, platforms);
 	game.physics.arcade.collide(aiColliders, platforms);
-	game.physics.arcade.collide(character, aiColliders);
+	game.physics.arcade.collide(playerCollider, aiColliders);
 	game.physics.arcade.overlap(aiColliders, coins, getShot, null, this);
 
-	character.body.velocity.x = 0;
-	character.body.velocity.x = 0;
+	playerCollider.body.velocity.x = 0;
 	ai.body.velocity.x = 0;
 
 	cursors = game.input.keyboard.createCursorKeys();
 	shootKey.onDown.add(shoot, this);
 
 	updateAis(ais);
-	if(cursors.up.isDown && character.body.touching.down){
+	if(cursors.up.isDown && playerCollider.body.touching.down){
 		if(lastLeft)
 			character.animations.play('lJump');
 		else
 			character.animations.play('rJump');
-		character.body.velocity.y = -350;
+		playerCollider.body.velocity.y = -350;
 	}
 	if(cursors.right.isDown && !playerCollider.body.touching.right){
 		character.animations.play('right');
-		character.body.velocity.x = 100;
+		playerCollider.body.velocity.x = 100;
 		lastLeft = false;
 	}
 	if(cursors.left.isDown && !playerCollider.body.touching.left){
 		character.animations.play('left');
-		character.body.velocity.x = -100;
+		playerCollider.body.velocity.x = -100;
 		lastLeft = true;
 	}
 	if(!cursors.left.isDown && !cursors.right.isDown && !cursors.up.isDown && !shootKey.isDown)
@@ -230,7 +227,7 @@ function update() {
 		else
 			character.animations.play('rFall');
 	}
-	if(!cursors.left.isDown && !cursors.right.isDown && !cursors.up.isDown && !shootKey.isDown && character.body.touching.down){
+	if(!cursors.left.isDown && !cursors.right.isDown && !cursors.up.isDown && !shootKey.isDown && playerCollider.body.touching.down){
 		if(lastLeft)
 			character.animations.play('lIdle');
 		else
@@ -239,8 +236,8 @@ function update() {
 	if(levelUpKey.isDown){
 		levelUp();
 	}
-	playerCollider.x = character.x + character.width/2 - playerCollider.width/2;
-	playerCollider.y = character.y + character.height/2 - playerCollider.height/2;
+	character.x = playerCollider.x + playerCollider.width/2 - character.width/2;
+	character.y = playerCollider.y + playerCollider.height/2 - character.height/2 - 2;
 }
 
 function levelUp(){
@@ -494,10 +491,10 @@ function getShot(aiCollider, coin){
 function shoot(){
 	if(lastLeft){
 		character.animations.play('lShoot');
-		coin = coins.create(character.x - 20, character.y + character.width/2, 'coin');
+		coin = coins.create(character.x , character.y + character.width/2, 'coin');
 	}else{
 		character.animations.play('rShoot');
-		coin = coins.create(character.x + 170, character.y + character.width/2, 'coin');
+		coin = coins.create(character.x + 150, character.y + character.width/2, 'coin');
 	}
 	coin.width = 20;
 	coin.height = 20;
